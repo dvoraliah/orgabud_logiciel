@@ -2,12 +2,14 @@ import requests
 from PyQt6 import QtCore
 from PyQt6.QtWidgets import QLabel, QWidget, QTableWidget, QTableWidgetItem, QVBoxLayout, QPushButton
 from requests.structures import CaseInsensitiveDict
+from editApp import EditApp
 
 
 class MainApp(QWidget):
     def __init__(self, token):
         super().__init__()
 
+        self.editApp = None
         self.window = None
         self.id_obj = None
         self.button_delete = None
@@ -22,6 +24,7 @@ class MainApp(QWidget):
         self.headers["Authorization"] = "Bearer " + token
         self.resize(850, 600)
         self.setStyleSheet('font-size: 15px, font-')
+        self.setWindowTitle('Gestion des utilisateurs')
         label = QLabel('', parent=self)
         self.data_users()
 
@@ -50,16 +53,18 @@ class MainApp(QWidget):
             self.tableWidget.setItem(i, 3, QTableWidgetItem(status))
             self.button_edit = QPushButton('edit')
             self.button_edit.id_obj = str(self.response_json[i]["id"])
+            self.button_edit.pseudo_row = str(self.response_json[i]["name"])
+            self.button_edit.email_row = str(self.response_json[i]["email"])
             self.button_edit.button_row = i
             self.button_edit.button_column = 4
             self.button_edit.clicked.connect(self.button_update_clicked)
-            self.tableWidget.setCellWidget(i, 5, self.button_edit)
+            self.tableWidget.setCellWidget(i, 4, self.button_edit)
             self.button_delete = QPushButton('suppr')
             self.button_delete.id_obj = self.response_json[i]["id"]
             self.button_delete.button_row = i
-            self.button_delete.button_column = 4
+            self.button_delete.button_column = 5
             self.button_delete.clicked.connect(self.button_delete_clicked)
-            self.tableWidget.setCellWidget(i, 4, self.button_delete)
+            self.tableWidget.setCellWidget(i, 5, self.button_delete)
         self.tableWidget.setColumnWidth(0, 20)
         self.tableWidget.setColumnWidth(3, 80)
         self.tableWidget.setColumnWidth(4, 80)
@@ -67,20 +72,31 @@ class MainApp(QWidget):
 
         # button.show()
 
-    def button_update_clicked(self, arg):
+    def button_update_clicked(self):
+        """
+        Fonction d'update après le click sur bouton dédié
+
+        """
         button = self.sender()
         print(button.button_row)
         print(button.button_column)
         print(button.id_obj)
-        print(arg)
+        self.editApp = EditApp(self.token, str(button.id_obj), button.pseudo_row, button.email_row )
+        self.editApp.show()
+        self.close()
 
     def button_delete_clicked(self):
+        """
+        Fonction de suppression après le click sur le bouton dédié
+        récupère l'id pour la suppression en database
+        et la row pour la suppression de la ligne
+        TODO : afficher une fenêtre de validation avant suppression
+        """
         button = self.sender()
         api_url = 'http://5.39.76.125/dvoraliah/orgabud-website/public/index.php/api/users/' + str(button.id_obj)
         response_API = requests.delete(api_url, headers=self.headers)
         response_statut = response_API.status_code
         response_json = response_API.json()
-        print("delete")
-        self.tableWidget.removeRow(button.button_row)
-        self.data_users()
-        print("success")
+        if response_statut == 200 :
+            self.tableWidget.removeRow(button.button_row)
+            self.data_users()
