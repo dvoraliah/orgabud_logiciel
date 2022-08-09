@@ -1,8 +1,8 @@
 import requests
-from PyQt6 import QtCore
-from PyQt6.QtWidgets import QLabel, QWidget, QTableWidget, QTableWidgetItem, QVBoxLayout, QPushButton, QGridLayout, \
+from PyQt6.QtWidgets import QLabel, QWidget, QPushButton, QGridLayout, \
     QSizePolicy, QComboBox
 from requests.structures import CaseInsensitiveDict
+
 import loggedApp
 
 
@@ -10,6 +10,7 @@ class EditApp(QWidget):
     def __init__(self, token, id_updated, pseudo, email):
         super().__init__()
 
+        self.status_changed = None
         self.comboBox = None
         self.email = email
         self.pseudo = pseudo
@@ -35,7 +36,7 @@ class EditApp(QWidget):
             self.mainApp.show()
             self.close()
         else:
-            print("erreur")
+            print("La mise à jour du statut est impossible. Erreur " + response_statut)
 
     def form_update(self):
         self.comboBox = QComboBox()
