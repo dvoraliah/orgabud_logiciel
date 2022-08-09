@@ -22,7 +22,7 @@ class MainApp(QWidget):
         self.headers = CaseInsensitiveDict()
         self.headers["Accept"] = "application/json"
         self.headers["Authorization"] = "Bearer " + token
-        self.resize(850, 600)
+        self.resize(950, 600)
         self.setStyleSheet('font-size: 15px, font-')
         self.setWindowTitle('Gestion des utilisateurs')
         label = QLabel('', parent=self)

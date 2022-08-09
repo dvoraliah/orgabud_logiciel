@@ -40,7 +40,7 @@ class EditApp(QWidget):
 
     def form_update(self):
         self.comboBox = QComboBox()
-        self.comboBox.addItems(["User", "Premium", "Admin"])
+        self.comboBox.addItems(["Selectionner","User", "Premium", "Admin"])
         self.comboBox.currentIndexChanged.connect(self.selection_change)
         layout = QGridLayout()
         self.setLayout(layout)
