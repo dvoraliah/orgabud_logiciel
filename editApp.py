@@ -36,7 +36,7 @@ class EditApp(QWidget):
             self.mainApp.show()
             self.close()
         else:
-            print("La mise à jour du statut est impossible. Erreur " + response_statut)
+            print("La mise à jour du statut est impossible. Erreur " + str(response_statut))
 
     def form_update(self):
         self.comboBox = QComboBox()
