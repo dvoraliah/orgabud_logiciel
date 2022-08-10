@@ -64,8 +64,8 @@ class LoginWindow(QWidget):
         password = self.lineEdits['Password'].text()
 
         self.api_url = 'http://5.39.76.125/dvoraliah/orgabud-website/public/index.php/api/login'
-        # self.response_API = requests.post(self.api_url, data={'email': username, 'password': password})
-        self.response_API = requests.post(self.api_url, data={'email': "admin@test.fr", 'password': "anya"})
+        self.response_API = requests.post(self.api_url, data={'email': username, 'password': password})
+        # self.response_API = requests.post(self.api_url, data={'email': "admin@test.fr", 'password': "anya"})
         self.response_statut = self.response_API.status_code
         self.response_text = self.response_API.text
         self.response_json = self.response_API.json()
