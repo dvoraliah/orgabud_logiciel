@@ -10,6 +10,7 @@ class EditApp(QWidget):
     def __init__(self, token, id_updated, pseudo, email):
         super().__init__()
 
+        self.previous_status = None
         self.status_changed = None
         self.comboBox = None
         self.email = email
@@ -27,9 +28,13 @@ class EditApp(QWidget):
         self.form_update()
 
     def after_save(self):
+        if self.status_changed is None:
+            self.status_changed = self.previous_status
         api_url = 'http://5.39.76.125/dvoraliah/orgabud-website/public/index.php/api/users/' + str(self.id_updated)
         response_API = requests.put(api_url, headers=self.headers, data={'status_id': self.status_changed})
         response_statut = response_API.status_code
+        print(api_url)
+        print(self.id_updated)
         response_json = response_API.json()
         if response_statut == 200:
             self.mainApp = loggedApp.MainApp(self.token)
@@ -39,8 +44,13 @@ class EditApp(QWidget):
             print("La mise à jour du statut est impossible. Erreur " + str(response_statut))
 
     def form_update(self):
+        api_url = 'http://5.39.76.125/dvoraliah/orgabud-website/public/index.php/api/users/' + str(self.id_updated)
+        response_API = requests.get(api_url, headers=self.headers)
+        response_json = response_API.json()
+        self.previous_status = response_json["status_id"]
         self.comboBox = QComboBox()
-        self.comboBox.addItems(["Selectionner","User", "Premium", "Admin"])
+        self.comboBox.addItems(["User", "Premium", "Admin"])
+        self.comboBox.setCurrentIndex(response_json["status_id"] - 1)
         self.comboBox.currentIndexChanged.connect(self.selection_change)
         layout = QGridLayout()
         self.setLayout(layout)
@@ -57,9 +67,18 @@ class EditApp(QWidget):
         button_save = QPushButton('&Save', clicked=self.after_save)
         layout.addWidget(self.comboBox, 2, 3, 1, 1)
         layout.addWidget(button_save, 3, 3, 1, 1)
+        button_go_back = QPushButton('&Return', clicked=self.go_back)
+        layout.addWidget(button_go_back, 4, 3, 1, 1)
+
+    def go_back(self):
+        self.mainApp = loggedApp.MainApp(self.token)
+        self.mainApp.show()
+        self.close()
 
     def selection_change(self):
+
         print("selection changed ", self.comboBox.currentText())
+
         if self.comboBox.currentText() == "Admin":
             self.status_changed = 3
         elif self.comboBox.currentText() == "Premium":

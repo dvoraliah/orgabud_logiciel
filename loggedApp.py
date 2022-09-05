@@ -1,7 +1,11 @@
 import requests
 from PyQt6 import QtCore
-from PyQt6.QtWidgets import QLabel, QWidget, QTableWidget, QTableWidgetItem, QVBoxLayout, QPushButton
+from PyQt6.QtCore import Qt
+from PyQt6.QtWidgets import QLabel, QWidget, QTableWidget, QTableWidgetItem, QVBoxLayout, QPushButton, QDialog, \
+    QDialogButtonBox
 from requests.structures import CaseInsensitiveDict
+
+from customDialog import CustomDialog
 from editApp import EditApp
 
 
@@ -81,7 +85,7 @@ class MainApp(QWidget):
         print(button.button_row)
         print(button.button_column)
         print(button.id_obj)
-        self.editApp = EditApp(self.token, str(button.id_obj), button.pseudo_row, button.email_row )
+        self.editApp = EditApp(self.token, str(button.id_obj), button.pseudo_row, button.email_row)
         self.editApp.show()
         self.close()
 
@@ -90,13 +94,16 @@ class MainApp(QWidget):
         Fonction de suppression après le click sur le bouton dédié
         récupère l'id pour la suppression en database
         et la row pour la suppression de la ligne
-        TODO : afficher une fenêtre de validation avant suppression
         """
-        button = self.sender()
-        api_url = 'http://5.39.76.125/dvoraliah/orgabud-website/public/index.php/api/users/' + str(button.id_obj)
-        response_API = requests.delete(api_url, headers=self.headers)
-        response_statut = response_API.status_code
-        response_json = response_API.json()
-        if response_statut == 200 :
-            self.tableWidget.removeRow(button.button_row)
-            self.data_users()
+        QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel
+        dlg = CustomDialog(self)
+        if dlg.exec():
+            button = self.sender()
+            api_url = 'http://5.39.76.125/dvoraliah/orgabud-website/public/index.php/api/users/' + str(button.id_obj)
+            response_API = requests.delete(api_url, headers=self.headers)
+            response_statut = response_API.status_code
+
+            if response_statut == 200:
+                self.tableWidget.removeRow(button.button_row)
+                self.data_users()
+
